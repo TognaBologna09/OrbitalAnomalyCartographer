@@ -1,2 +1,4 @@
 # OrbitalAnomalyCartographer
 This is a program written for an assignment in an Orbital Dynamics course.
+
+The goal of this script is to translate between three angles used to represent the position of an object throughout its orbit: the true anomaly, the eccentric anomaly, and the mean anomaly. The true anomaly is a measure of the actual position, while the mean anomaly is a measure of the 'time' in an orbit (when m = pi/2, you are 1/4 of the way through the orbit). The eccentric anomaly is an angle used to relate the other angles. While this script translates between the anomalies, it also plots the output using the "AnomalyCartographer" function. Other functions specific to assignment credit have been commented out. 
