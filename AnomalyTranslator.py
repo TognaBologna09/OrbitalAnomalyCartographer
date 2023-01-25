@@ -159,7 +159,22 @@ def E_transcendental(e,M):
         
     return ecc_anom
 
-
+def EccentricInputCollection():
+    try:
+        n00 = input('\nWhat is the eccentricity of the orbit? \t(in decimals) : ')
+        e = float(n00)
+       
+        if e >= 1:
+            
+            raise ValueError('Value is too eccentric! The orbit is hyperbolic and will not properly plot. \n...\nPlease input a new value between [0,1)')
+        elif e<0 :
+            raise ValueError('Value must be non-negative. \n...')
+        
+    except ValueError:
+        print('\nPlease input a new value between [0,1)')
+        EccentricInputCollection()
+            
+    return e
 
 ### The Three Routines ###
 
@@ -244,7 +259,6 @@ def Anomaly_Cartographer():
 
     while True:
         
-        print("Anomaly Cartographer: Graphing Orbits\n")
 ## Asking for user input variable a for the semi-major axis ##-----------------
         n000= input('\nWhat is the value for the semi-major axis? : ')
         a = float(n000)
@@ -258,9 +272,10 @@ def Anomaly_Cartographer():
     
 
 ## Asking for user input variable e for the eccentricity ##--------------------
-        n00 = input('\nWhat is the eccentricity of the orbit? \t(in decimals) : ')
-        e = float(n00)
         
+        e = EccentricInputCollection()
+        
+       
         F_eccentric = (X+e)**2 + (Y)**2 - 1     # contour equation of ellipse equal 0
         F_E = np.array(F_eccentric)
         F_E = F_E.reshape( (len(x),len(y)) )
@@ -274,14 +289,14 @@ def Anomaly_Cartographer():
         # M = M_kep_eq(e,E)   # array of M using the kepler equation (E-->m)
             
 ## Variables to establish cartesian origins and symmetries ##------------------
-    
+
         center_ellipse_x = -a*e     # center of ellipse, x coord
         p_focus_ellipse_x  = 0      # focus of ellipse, x coord
         center_ellipse_y = 0        # center of ellipse, y coord
         
         x_radial = np.multiply(r,np.cos(v)) # cartesian x,y of radial eqn
         y_radial = np.multiply(r,np.sin(v))
-    
+
         # x_ecc = np.multiply(1,np.cos(E))-a*e    # cartesian x,y of ecc. circle
         # y_ecc = np.multiply(1,np.sin(E))        # with center at (-ae,0)   
         
@@ -350,18 +365,14 @@ def Anomaly_Cartographer():
             
             "Plotting the line connecting the radial equation to the eccentric circle"
             # a final line to connect the ellipse to the eccentric circle
-            #  var = ax.plot([np.multiply(X1,Y1), np.multiply(X2,Y2)], labels)
-            ecc_rad_v_p1 = np.multiply((radial(a,e,[v_choice])[0]), np.cos(v_choice))
-            ecc_rad_v_p2 = np.multiply((radial(a,e,[v_choice])[0]), np.sin(v_choice))
-            ecc_rad_vector = ax.plot([ecc_rad_v_p1, ecc_rad_v_p1], [a*np.sin(E_choice), ecc_rad_v_p2], color = 'purple', label='Line connecting Ell.->Ecc.')
-            # ecc_rad_vector = ax.plot([np.multiply(radial(a,e,(v_choice)),np.cos(v_choice)),np.multiply(radial(a,e,[v_choice]),np.cos(v_choice))],[a*np.sin(E_choice),np.multiply(radial(a,e,[v_choice]),np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
+            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice]),np.cos(v_choice)),np.multiply(radial(a,e,[v_choice]),np.cos(v_choice))],[a*np.sin(E_choice),np.multiply(radial(a,e,[v_choice]),np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
         
             "Plotting a line for the true anomaly"
             # and a line is drawn using the angle of choice using the distance formula
-            rad_ell_vector = ax.plot([p_focus_ellipse_x, np.multiply((radial(a,e,[v_choice])[0]),np.cos(v_choice) )] ,[center_ellipse_y,np.multiply(radial(a,e,[v_choice])[0],np.sin(v_choice))], color= 'royalblue', label='True Anomaly r Vector')
+            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice]),np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice]),np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
             
             # setting limits, title, gridlines
-            ax.set_title('graph of elliptical orbit and eccentric circle, \n(a,e,v): ('+str(a)+','+str(e)+','+str(v_choice)+')')
+            plt.title('graph of elliptical orbit and eccentric circle, \n(a,e,v): ('+str(a)+','+str(e)+','+str(v_choice)+')')
             plt.xlim(-2*a,1*a)
             plt.ylim(-2*a,1.5*a)
             
@@ -406,8 +417,7 @@ def Anomaly_Cartographer():
             rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice]),np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice]),np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
             
             # setting limits, title, gridlines
-            ax.set_title('graph of elliptical orbit and eccentric circle, \n(a,e,E): ('+str(a)+','+str(e)+','+str(E_choice)+')')
-            plt.title()
+            plt.title('graph of elliptical orbit and eccentric circle, \n(a,e,E): ('+str(a)+','+str(e)+','+str(E_choice)+')')
             plt.xlim(-2*a,1*a)
             plt.ylim(-2*a,1.5*a)
                
@@ -452,7 +462,7 @@ def Anomaly_Cartographer():
             rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice]),np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice]),np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
             
             # setting limits, title, gridlines
-            ax.set_title('graph of elliptical orbit and eccentric circle, \n(a,e,m): ('+str(a)+','+str(e)+','+str(M_choice)+')')
+            plt.title('graph of elliptical orbit and eccentric circle, \n(a,e,m): ('+str(a)+','+str(e)+','+str(M_choice)+')')
             plt.xlim(-2*a,1*a)
             plt.ylim(-2*a,1.5*a)
             
@@ -470,35 +480,7 @@ def Anomaly_Cartographer():
         
             else:
                 print('character not recognized')
-    
-    
-    # "Plotting a line for the eccentric anomaly"
-    # # and a line is drawn using the E_angle from v using the converter, and distance formula
-    # ecc_cir_vector = ax.plot([np.multiply(1, np.cos(E_choice))-a*e,center_ellipse_x],[np.multiply(1,np.sin(E_choice)),0], color= 'darkorange', label='Eccentric Anomaly r Vector')
-    # # ecc_cir_vector = plt.plot([ a*cos(E), -2ae ],[a*sin(E), 0])
-    
-    
-    
-    # "Plotting a line for the mean anomaly"
-    # # and a line is drawn out using the mean anomaly
-    # m_vector = ax.plot([np.multiply(1, np.cos(M_choice))-a*e,center_ellipse_x],[np.multiply(1, np.sin(M_choice)),center_ellipse_y], color ='red', label='Mean Anomaly r Vector')
-    
-    # "Plotting the line connecting the radial equation to the eccentric circle"
-    # # a final line to connect the ellipse to the eccentric circle
-    # ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice]),np.cos(v_choice)),np.multiply(radial(a,e,[v_choice]),np.cos(v_choice))],[a*np.sin(E_choice),np.multiply(radial(a,e,[v_choice]),np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
-
-    
-    # plt.xlim(-2.1,1)
-    # plt.ylim(-2,1.5)
-    
-    # plt.legend(loc= 'lower right')
-    # plt.show()
-    
-    # v_E_M = '(v,E,m)'+' : '+'('+str(v_choice)+', '+str(float("{:.4f}".format(E_choice)))+', '+str(float("{:.4f}".format(M_choice)))+')'
-    # return v_E_M
-
-
-
+       
 ### r1,r2.Using Equations ###----------------------------------------------------
 # (writing variables)
 
@@ -507,18 +489,18 @@ u=1
 P = 2*np.pi*(a**3/u)**(1/2)
 
 ecc      = 0.8
-theta    = np.arange(0,2*np.pi,np.pi/100)
+theta    = np.arange(0,2*np.pi,np.pi/1000)
 
 Ecc_angles = E_ecc_anom(ecc,theta)          # v-->E
 
 M_angles = M_kep_eq(ecc,Ecc_angles)         # E-->M
 
 
-
 ### Plotting the three anomalies ###-------------------------------------------
 
 def AnomalyPlots():
     while True:
+        print('For extra credit!')
         n1 = input('Would you like to see a plot of the three anomalies? (y/n) : ')
         y='y'
         n='n'
@@ -572,7 +554,6 @@ def AnomalyPlots():
             print('character not recognized')
         break 
 
-    #####
 
 ### Testing Functions of routine 1 ###-----------------------------------------
 # 
@@ -599,7 +580,7 @@ def AnomalyPlots():
 ### Begin: Routine 3 ###
 
 # take a test value...
-M = np.pi/2
+# M = np.pi/2
 
 # this angle m is a constant for the transcendental equation  
 # intersect = M_angles - np.pi/2
@@ -613,7 +594,7 @@ M = np.pi/2
 " Writing User-end Console programs "###---------------------------------------
 
 "       Anomaly Translator      "
-"       uses functions:         "
+"   uses functions:             "
 "                               "
 "       --v_AnomalyTranslator   "
 "           -E_ecc_anom         " # v-->E
@@ -627,7 +608,7 @@ M = np.pi/2
 "           -M_to_E             " # m-->E
 "           -E_transcendental   " # m-->E
 "           -E_to_v             " # E-->v
-
+    
 def AnomalyTranslator():
     print('\nWelcome to the Anomaly Translator: Follow the prompts to translate orbital angles!')
     print('\nYou will be asked to input two values in order to accurately translate angles.')
@@ -636,11 +617,12 @@ def AnomalyTranslator():
     n='n'
     
     while True:
+
+        e = EccentricInputCollection()
+        # n00 = input('\nWhat is the eccentricity of the orbit? \t(in decimals) : ')
+        # e = float(n00)
         
-        n00 = input('\nWhat is the eccentricity of the orbit? \t(in decimals) : ')
-        e = float(n00)
-        
-        print('\n... notice ... possible input angles from [0, 6.28]\n')
+        print('\n... notice ... possible input angles from [0, 2pi]\n')
         n0 = input('What angle do you have? \t(v/E/m) : ')
         
         v = 'v'
@@ -708,6 +690,7 @@ def AnomalyTranslator():
 "           -E_to_v             " # E-->v
 "                               "
 "       --radial_eq             " # ellipse equation
+
 def AnomalyCartographer():
         
     while True:
@@ -716,9 +699,9 @@ def AnomalyCartographer():
         y='y'
         n='n'
         
-        theta = np.linspace(0,2*np.pi,200)
+        theta = np.linspace(0,2*np.pi,2000)
         
-        if n2 == n:
+        if n2 ==n:
             print('Goodbye!')
             break
         elif n2 ==y:
@@ -726,8 +709,8 @@ def AnomalyCartographer():
                     
                 print(Anomaly_Cartographer())
                 
-                n2b = input('Do you want to use the Cartographer again? (y/n) : ')
-                if n2b == n:
+                n2b = input('Do you want to see another graph? (y/n) : ')
+                if n2b ==n:
                     print('Goodbye!')
                     
                     break
@@ -738,127 +721,9 @@ def AnomalyCartographer():
         else:
             print('character not recognized')
         
-# AnomalyTranslator()
+AnomalyTranslator()
 AnomalyCartographer()
 # AnomalyPlots()
-
-## Creating the animation for the cartographer
-
-# for true anomaly
-# for eccentric anomaly
-# for mean anomaly
-# for line connecting ellipse to the eccentric circle
-
-# from matplotlib.animation import FuncAnimation
-# a,e = 1,0
-
-# fig, ax = plt.subplots()
-
-# line_v, = ax.plot([],[])
-# # line_m, = ax.plot([],[])
-# # line_E, = ax.plot([],[])
-# # line_vE, = ax.plot([],[])
-
-# ax.set_xlim(-2*a-a*e,1+a)
-# ax.set_ylim(-2,2)
-
-# x = np.linspace(-2*a,a,len(theta))    # cartesian x, and y arrays of length
-# y = np.linspace(-2*a,a,len(theta))    # equal to the input angle array
-
-# X,Y = np.meshgrid(x,y)   # using meshgrid-->contour plot
-
-# ## Asking for user input variable e for the eccentricity ##--------------------
-# # n00 = input('\nWhat is the eccentricity of the orbit? \t(in decimals) : ')
-# # e = float(n00)
-# F_eccentric = (X+e)**2 + (Y)**2 - 1     # contour equation of ellipse equal 0
-# # F_E = np.array(F_eccentric)
-# # F_E = F_E.reshape( (len(x),len(y)) )
-  
-# ## Creating the shape for the elliptical orbit given the radial equation ##----
-   
-# r = radial(a,e,theta)
-# x_radial = r*np.cos(theta)
-# y_radial = r*np.sin(theta)
-
-# "Plotting the radial equation"
-# # the ellipse is plotted using radial equation in cartesian form 
-# ax.plot(x_radial,y_radial, label='Ellipse',color='blue')   
-
-# "Plotting the eccentric circle"
-# # the eccentric circle is plotted using a contour plot
-# ax.contour(a*X,a*Y,F_eccentric,[0],colors ='orange')
-
-# # initialization func : plot background of each frame
-# def init_lv():
-#     pericenter_x = a-a*e
-#     pericenter_y = 0
-#     line_v.set_data([pericenter_x,0],[pericenter_y,0])
-#     return line_v,
-
-# r = radial(a,e,theta)
-# x_radial = r*np.cos(theta)
-# y_radial = r*np.sin(theta)
-# # animation function, called sequentially
-# def animate_lv(theta):
-#     r = radial(a,e,theta)
-#     x_radial = r*np.cos(theta)
-#     y_radial = r*np.sin(theta)
-    
-#     line_v.set_data([x_radial,0],[y_radial,0],color='red')
-#     return line_v, 
-
-# fig.canvas.draw() 
-# # call the animator
-# anim = FuncAnimation(fig, animate_lv, init_func=init_lv, frames = np.linspace(0,2*np.pi,100), interval=20, blit=True)
-# plt.show()
-
-# for frame in range(0,len(theta)):
-#     fig,ax = plt.subplots()
-    
-    
-#     time.sleep(0.07)
-#     clear_output(wait=True)
-#     center_ellipse_x = -a*e     # center of ellipse, x coord
-#     p_focus_ellipse_x  = 0      # focus of ellipse, x coord
-#     center_ellipse_y = 0        # center of ellipse, y coord
-#     "Plotting a line for the eccentric anomaly"
-#     # and a line is drawn using the E_angle from v using the converter, and distance formula
-#     ecc_cir_vector = ax.plot([np.multiply(a,a*np.cos(Ecc_angles[frame]))-a*e,center_ellipse_x],[np.multiply(a,np.sin(Ecc_angles[frame])),0], color= 'darkorange', label='Eccentric Anomaly r Vector')
-#     # ecc_cir_vector = plt.plot([ a*cos(E), -2ae ],[a*sin(E), 0])
-#     # ex=[np.multiply(a,a*np.cos(Ecc_angles[frame]))-a*e,center_ellipse_x]
-#     # ey=[np.multiply(a,np.sin(Ecc_angles[frame])),0]
-     
-#     # Ecc_anom_line.set_data(ex,ey)
-#     "Plotting a line for the mean anomaly"
-#     # and a line is drawn out using the mean anomaly
-#     m_vector = ax.plot([np.multiply(a, np.cos(M_angles[frame]))-a*e,center_ellipse_x],[np.multiply(a, np.sin(M_angles[frame])),center_ellipse_y], color ='red', label='Mean Anomaly r Vector')
-#     # mx.append([np.multiply(a, np.cos(M_angles[frame]))-a*e,center_ellipse_x])
-#     # my.append([np.multiply(a, np.sin(M_angles[frame])),center_ellipse_y])
-    
-#     # M_anom_line.set_xdata(mx)
-#     # M_anom_line.set_ydata(my)
-#     "Plotting the line connecting the radial equation to the eccentric circle"
-#     # a final line to connect the ellipse to the eccentric circle
-#     ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[theta[frame]]),np.cos(theta[frame])),np.multiply(radial(a,e,[theta[frame]]),np.cos(theta[frame]))],[a*np.sin(Ecc_angles[frame]),np.multiply(radial(a,e,[theta[frame]]),np.sin(theta[frame]))], color = 'purple', label='Line connecting Ell.->Ecc.')
-#     # lx.append([np.multiply(radial(a,e,[theta[frame]]),np.cos(theta[frame])),np.multiply(radial(a,e,[theta[frame]]),np.cos(theta[frame]))])
-#     # ly.append([a*np.sin(Ecc_angles[frame]),np.multiply(radial(a,e,[theta[frame]]),np.sin(theta[frame]))])
-    
-#     # ell_ecc_line.set_xdata(lx)
-#     # ell_ecc_line.set_ydata(ly)
-#     "Plotting a line for the true anomaly"
-#     # and a line is drawn using the angle of choice using the distance formula
-#     rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[theta[frame]]),np.cos(theta[frame]) )],[center_ellipse_y,np.multiply(radial(a,e,[theta[frame]]),np.sin(theta[frame])) ], color= 'royalblue', label='True Anomaly r Vector')
-#     # rx.append([p_focus_ellipse_x, np.multiply(radial(a,e,[theta[frame]]),np.cos(theta[frame]) )])
-#     # ry.append([center_ellipse_y,np.multiply(radial(a,e,[theta[frame]]),np.sin(theta[frame])) ])
-#     plt.show()
-    
-    
-#     # ell_line.set_xdata(rx)
-#     # ell_line.set_ydata(ry) 
-# #animation = FuncAnimation(fig, func=animation_frame, frames = np.linspace(0,2000,2000), interval=100)
-
-
-
 
 
 
