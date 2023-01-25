@@ -8,4 +8,5 @@ The goal of this script is to translate between three angles used to represent t
 This script was written to be used in the Spyder IDE and offers prompts to the user in the console. The user is meant to follow the prompts in the console and input the values directly, and once the program concludes the graph(s) will appear.
 
 ### Example Output
-![Alt text](https://github.com/TognaBologna09/CCD-Image-Calibration/blob/main/Figure_1_Coadded_i_NGC7469.png)
+![Alt text](https://github.com/TognaBologna09/OrbitalAnomalyCartographer/blob/main/OrbitalAngleConsoleExample.png)
+![Alt text](https://github.com/TognaBologna09/OrbitalAnomalyCartographer/blob/main/AnomalyCartographerExample.png)
