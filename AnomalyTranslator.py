@@ -365,11 +365,11 @@ def Anomaly_Cartographer():
             
             "Plotting the line connecting the radial equation to the eccentric circle"
             # a final line to connect the ellipse to the eccentric circle
-            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice]),np.cos(v_choice)),np.multiply(radial(a,e,[v_choice]),np.cos(v_choice))],[a*np.sin(E_choice),np.multiply(radial(a,e,[v_choice]),np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
+            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice])[0],np.cos(v_choice)), np.multiply(radial(a,e,[v_choice])[0], np.cos(v_choice))],[a*np.sin(E_choice), np.multiply(radial(a,e,[v_choice])[0], np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
         
             "Plotting a line for the true anomaly"
             # and a line is drawn using the angle of choice using the distance formula
-            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice]),np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice]),np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
+            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice])[0],np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice])[0],np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
             
             # setting limits, title, gridlines
             plt.title('graph of elliptical orbit and eccentric circle, \n(a,e,v): ('+str(a)+','+str(e)+','+str(v_choice)+')')
@@ -401,7 +401,7 @@ def Anomaly_Cartographer():
 
             "Plotting a line for the eccentric anomaly"
             # and a line is drawn using the E_angle from v using the converter, and distance formula
-            ecc_cir_vector = ax.plot([np.multiply(a, np.cos(E_choice))-a*e,center_ellipse_x],[np.multiply(a,np.sin(E_choice)),0], color= 'darkorange', label='Eccentric Anomaly r Vector')
+            ecc_cir_vector = ax.plot([np.multiply(a,a*np.cos(E_choice))-a*e,center_ellipse_x],[np.multiply(a,np.sin(E_choice)),0], color= 'darkorange', label='Eccentric Anomaly r Vector')
             # ecc_cir_vector = plt.plot([ a*cos(E), -2ae ],[a*sin(E), 0])
             
             "Plotting a line for the mean anomaly"
@@ -410,11 +410,11 @@ def Anomaly_Cartographer():
             
             "Plotting the line connecting the radial equation to the eccentric circle"
             # a final line to connect the ellipse to the eccentric circle
-            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice]),np.cos(v_choice)),np.multiply(radial(a,e,[v_choice]),np.cos(v_choice))],[a*np.sin(E_choice),np.multiply(radial(a,e,[v_choice]),np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
+            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice])[0],np.cos(v_choice)), np.multiply(radial(a,e,[v_choice])[0], np.cos(v_choice))],[a*np.sin(E_choice), np.multiply(radial(a,e,[v_choice])[0], np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
         
             "Plotting a line for the true anomaly"
             # and a line is drawn using the angle of choice using the distance formula
-            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice]),np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice]),np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
+            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice])[0],np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice])[0],np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
             
             # setting limits, title, gridlines
             plt.title('graph of elliptical orbit and eccentric circle, \n(a,e,E): ('+str(a)+','+str(e)+','+str(E_choice)+')')
@@ -446,7 +446,7 @@ def Anomaly_Cartographer():
 
             "Plotting a line for the eccentric anomaly"
             # and a line is drawn using the E_angle from v using the converter, and distance formula
-            ecc_cir_vector = ax.plot([np.multiply(a, np.cos(E_choice))-a*e,center_ellipse_x],[np.multiply(a,np.sin(E_choice)),0], color= 'darkorange', label='Eccentric Anomaly r Vector')
+            ecc_cir_vector = ax.plot([np.multiply(a,a*np.cos(E_choice))-a*e,center_ellipse_x],[np.multiply(a,np.sin(E_choice)),0], color= 'darkorange', label='Eccentric Anomaly r Vector')
             # ecc_cir_vector = plt.plot([ a*cos(E), -2ae ],[a*sin(E), 0])
             
             "Plotting a line for the mean anomaly"
@@ -455,11 +455,11 @@ def Anomaly_Cartographer():
             
             "Plotting the line connecting the radial equation to the eccentric circle"
             # a final line to connect the ellipse to the eccentric circle
-            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice]),np.cos(v_choice)),np.multiply(radial(a,e,[v_choice]),np.cos(v_choice))],[a*np.sin(E_choice),np.multiply(radial(a,e,[v_choice]),np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
+            ecc_rad_vector = ax.plot([np.multiply(radial(a,e,[v_choice])[0],np.cos(v_choice)), np.multiply(radial(a,e,[v_choice])[0], np.cos(v_choice))],[a*np.sin(E_choice), np.multiply(radial(a,e,[v_choice])[0], np.sin(v_choice))], color = 'purple', label='Line connecting Ell.->Ecc.')
         
             "Plotting a line for the true anomaly"
             # and a line is drawn using the angle of choice using the distance formula
-            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice]),np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice]),np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
+            rad_ell_vector = ax.plot( [p_focus_ellipse_x, np.multiply(radial(a,e,[v_choice])[0],np.cos(v_choice) )],[center_ellipse_y,np.multiply(radial(a,e,[v_choice])[0],np.sin(v_choice)) ], color= 'royalblue', label='True Anomaly r Vector')
             
             # setting limits, title, gridlines
             plt.title('graph of elliptical orbit and eccentric circle, \n(a,e,m): ('+str(a)+','+str(e)+','+str(M_choice)+')')
@@ -707,8 +707,9 @@ def AnomalyCartographer():
         elif n2 ==y:
             while True:
                     
-                print(Anomaly_Cartographer())
-                
+                map = Anomaly_Cartographer()
+                print(map)
+
                 n2b = input('Do you want to see another graph? (y/n) : ')
                 if n2b ==n:
                     print('Goodbye!')
@@ -721,9 +722,9 @@ def AnomalyCartographer():
         else:
             print('character not recognized')
         
-AnomalyTranslator()
+#AnomalyTranslator()
 AnomalyCartographer()
-# AnomalyPlots()
+#AnomalyPlots()
 
 
 
