@@ -137,24 +137,24 @@ class Window(ctk.CTkFrame):
 
         tab_configure = self.tabview.add("Configure")
 
-        configure_label_animation = ctk.CTkLabel(master = tab_configure, text = "Animation Controls")
-        configure_label_animation.place(x=55,y=10)
+        # configure_label_animation = ctk.CTkLabel(master = tab_configure, text = "Animation Controls")
+        # configure_label_animation.place(x=55,y=10)
 
-        configure_button_frewind = ctk.CTkButton(master = tab_configure, text="<<",width=30,height=30)
-        configure_button_frewind.place(x=10,y=50)
-        configure_button_rewind = ctk.CTkButton(master = tab_configure, text="<",width=30,height=30)
-        configure_button_rewind.place(x=50,y=50)
-        configure_button_play = ctk.CTkButton(master = tab_configure, text=">=",width=30,height=30)
-        configure_button_play.place(x=90,y=50)
-        configure_button_forward = ctk.CTkButton(master = tab_configure, text =">",width=30,height=30)
-        configure_button_forward.place(x=130,y=50)
-        configure_button_forward = ctk.CTkButton(master = tab_configure, text =">>",width=30,height=30)
-        configure_button_forward.place(x=170,y=50)
+        # configure_button_frewind = ctk.CTkButton(master = tab_configure, text="<<",width=30,height=30)
+        # configure_button_frewind.place(x=10,y=50)
+        # configure_button_rewind = ctk.CTkButton(master = tab_configure, text="<",width=30,height=30)
+        # configure_button_rewind.place(x=50,y=50)
+        # configure_button_play = ctk.CTkButton(master = tab_configure, text=">=",width=30,height=30)
+        # configure_button_play.place(x=90,y=50)
+        # configure_button_forward = ctk.CTkButton(master = tab_configure, text =">",width=30,height=30)
+        # configure_button_forward.place(x=130,y=50)
+        # configure_button_forward = ctk.CTkButton(master = tab_configure, text =">>",width=30,height=30)
+        # configure_button_forward.place(x=170,y=50)
 
-        configure_playbackSpeed_label = ctk.CTkLabel(master=tab_configure, text='Playback Speed')
-        configure_playbackSpeed_label.place(x=50, y=90)
-        configure_playbackSpeed_var = ctk.CTkEntry(master = tab_configure, width = 30)
-        configure_playbackSpeed_var.place(x=10, y=90)
+        # configure_playbackSpeed_label = ctk.CTkLabel(master=tab_configure, text='Playback Speed')
+        # configure_playbackSpeed_label.place(x=50, y=90)
+        # configure_playbackSpeed_var = ctk.CTkEntry(master = tab_configure, width = 30)
+        # configure_playbackSpeed_var.place(x=10, y=90)
 
         configure_plot_button = ctk.CTkButton(master = tab_configure, text ="Plot Objects", width=180, 
                                               command=lambda: [self.init_plot_window(),
@@ -167,15 +167,20 @@ class Window(ctk.CTkFrame):
                                                                 ])
         
         
-        configure_plot_button.place(x=10, y=130)
+        configure_plot_button.place(x=10, y=10)
 
+        self.configure_slider_label = ctk.CTkLabel(master = tab_configure,
+                                                text="Orbital Angle")
+        self.configure_slider_label.place(x=50, y=50)
         self.configure_slider = ctk.CTkSlider(master=tab_configure, 
                                             from_=-np.pi, 
                                             to=np.pi, 
                                             number_of_steps=1000,
                                             command=self.Animate_Manual,
-                                            width = 180)
-        self.configure_slider.place(x=10,y=170)
+                                            height = 580,
+                                            
+                                            orientation="vertical")
+        self.configure_slider.place(x=10,y=50)
 
 
     def init_plot_window(self):
