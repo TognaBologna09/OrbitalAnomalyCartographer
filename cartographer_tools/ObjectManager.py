@@ -49,7 +49,7 @@ class CelestialObject(Vector3):
 
         rx,ry,rz = self.radial_to_cart_array()
         self.rx2D, self.ry2D, self.rz2D = rx,ry,rz
-        
+
         rx,ry,rz = self.rotate_radial(self.theta)
         self.SetVector3Array(rx,ry,rz)
 
@@ -78,17 +78,13 @@ class CelestialObject(Vector3):
         z_radial = np.zeros(len(self.theta))
         for i in range(0,len(self.theta)):  # populate r array for breaking into cartesian components
 
-            # iterator = i+m.floor(self.initial_angle*1000)
-            # if iterator > len(self.theta):
-            #     iterator = iterator - len(self.theta)
-            
-            # angle = self.theta[iterator]
+
             angle = self.theta[i]
             self.r[i] = (
                     p 
                     / 
                     (1 + self.eccentricity*np.cos(angle))
-                        )
+                    )
 
         x_radial = np.multiply(self.r,np.cos(self.theta))
         y_radial = np.multiply(self.r,np.sin(self.theta))

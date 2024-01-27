@@ -117,7 +117,9 @@ class Window(ctk.CTkFrame):
                                                                                     objects_initAngle_var.get(),
                                                                                     objects_inclination_var.get(),
                                                                                     objects_omega_var.get()),
-                                                                                    self.Populate_Objects_List()]
+                                                                                    self.Populate_Objects_List(),
+                                                                                    self.Generate_Scatter_Plots,
+                                                                                    self.Generate_Lines]
                                                                                     )
                                                                                             
         self.objects_Generate_button.place(x=10,y=330)
@@ -217,7 +219,7 @@ class Window(ctk.CTkFrame):
         
         plt.Axes.set_axis_off(self.ax)
         # self.Plot_Full_Orbits()
-        self.Generate_Scatter_Plots()
+        # self.Generate_Scatter_Plots()
        
     def init_anim_window(self):
 
@@ -263,27 +265,9 @@ class Window(ctk.CTkFrame):
         self.scats.clear()
 
         for o in om.celestial_objects:
-            self.scats.append(self.ax.scatter(o.x[0],o.y[0],o.z[0]))
-
-    # def Animate_Manual(self, f):
-    #     frame = float(f)
-
-    #     self.Generate_Scatter_Plots()
-
-    #     print(len(self.scats))
-    #     self.ax.scatter([0],[0],[0], s=10,color='Yellow')
-
-    #     if len(om.celestial_objects) > 0:
-
-    #         for i in range(0,len(om.celestial_objects)):
-
-    #             a, b, c = om.celestial_objects[i].rotate_radial_scalarAngle(frame + np.pi + om.celestial_objects[i].initial_angle)
-                
-    #             self.scats[i] = self.ax.scatter(a,b,c)
-    #             print("offset it u whore")
-    #             self.scats[i].set_data_3d
-    #             print("nyeh")
-    #             self.fig.canvas.draw_idle()
+            # print(f"Object {o}: size = {o.size}")
+            scatter = self.ax.scatter(o.x[0],o.y[0],o.z[0], color=o.color)
+            self.scats.append(scatter)
             
     def Animate_Manual(self, f):
         frame = float(f)
@@ -303,15 +287,7 @@ class Window(ctk.CTkFrame):
                 if i < len(self.scats):
                     # Update the existing scatter plot's data
                     self.scats[i]._offsets3d=(a, b, c)
-                    # scatter = self.ax.scatter(a, b, c)
-                else:
-                    # Create a new scatter plot if it doesn't exist
-                    print("creating plot")
-                    scatter = self.ax.scatter(a, b, c, s=om.celestial_objects[i].size, color=om.celestial_objects[i].color)
-                    print(a,b,c)
-                    self.scats.append(scatter)
-
-        # print("offset it u whore")
+                    
         self.fig.canvas.draw_idle()
 
     theta_domain = np.linspace(0,2*np.pi,1000)
@@ -320,7 +296,7 @@ class Window(ctk.CTkFrame):
 
         self.lines.clear()
         for o in om.celestial_objects:
-            line = self.ax_anim.scatter(o.x,o.y, s=o.size, color = o.color)
+            line = self.ax_anim.scatter(o.x,o.y, s=o.size*10, color = o.color)
             self.lines.append(line)
     
     def Animate_Automatic(self,f):
