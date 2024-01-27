@@ -100,7 +100,7 @@ z = np.zeros(len(theta))
 
 u = []
 for i in range(0,len(x)):    
-    u.append( (x[i], y[i], z[i]))
+    u.append((x[i], y[i], z[i]))
 ux, uy, uz = zip(*u)
 
 fig = plt.figure(figsize=plt.figaspect(1)*1.5)
@@ -112,7 +112,7 @@ for i in range(0,len([inc])):
     for i in range(0,len(x)):
         u_quat.append(qv_mult(q,u[i]))
         u_quatx, u_quaty, u_quatz = zip(*u_quat)
-        
+
     ax.set_title('Rotated Orbit w/ RGB Cartesian Reference')
     
     ax.plot([1,0],[0,0],[0,0], label='x', color='b')
