@@ -3,24 +3,26 @@ import numpy as np
 
 # Plotting
 import matplotlib.pyplot as plt
-
 import matplotlib.animation as animation
-
 
 # custom libraries
 from cartographer_tools import object_manager as om
 from cartographer_tools import angle_calculator as ac
 
 class PlotManager:
-    # define global variables
+    
     lines_true = []
-    lines_ecc = []
     lines_mean = []
     scatter_plots_3d = []
     scatter_plots_2d = []
+    
+    def __init__(self):
+        self.fig = plt.Figure(figsize=(11.7,8.1))
+        self.fig.patch.set_facecolor('black')
+        plt.style.use('dark_background')
 
     def init_3d_plotting(self, plot_figure):
-        self.ax = plot_figure.add_subplot(111, projection='3d')
+        self.ax = plot_figure.add_axes([0.0,0.0,1,1], projection='3d')
         self.ax.grid(True)
         self.ax.set_axis_off()
 
@@ -41,7 +43,7 @@ class PlotManager:
         plt.Axes.set_axis_off(self.ax)
 
     def init_2d_plotting(self, plot_figure):
-        self.ax2 = plot_figure.add_subplot(224, projection='rectilinear')
+        self.ax2 = plot_figure.add_axes([0.64, 0.03, 0.34, 0.38])
         self.ax2.clear()
         self.ax2.set_axis_off()       
         self.ax2.plot(0,0, label='origin')
@@ -72,13 +74,14 @@ class PlotManager:
         else:
             for o in selected_id:
                 # self.ax2.cla()
-                x_2d,y_2d,z_2d = o.radial_to_cart_array()
+                x_2d,y_2d,z_2d = o.radial_to_cart_array(o.theta)
                 self.ax2.plot(x_2d,y_2d, color = o.color, linestyle='dashed', linewidth=min(o.size/1.5, 1))
 
                 plot_figure.canvas.draw_idle()
 
     def generate_scatter_plots_3d(self):
-       
+        
+        self.delete_animation_3d()
         self.scatter_plots_3d.clear()
 
         for o in om.celestial_objects:
@@ -88,9 +91,10 @@ class PlotManager:
 
     def generate_scatter_plots_2d(self, selected_id: list):
 
+        self.delete_animation_2d()
         self.scatter_plots_2d.clear()
         self.lines_true.clear()
-        self.lines_ecc.clear()
+        # self.lines_ecc.clear()
         self.lines_mean.clear()
         
         self.ax2.cla()
@@ -126,7 +130,13 @@ class PlotManager:
             
             for i in range(0, len(om.celestial_objects)):
 
-                a, b, c = om.celestial_objects[i].rotate_radial_scalarDay(frame + om.celestial_objects[i].initial_angle*np.divide(1,om.celestial_objects[i].degreePerDay))
+                e = om.celestial_objects[i].eccentricity
+
+                days_to_angle = frame*om.celestial_objects[i].degree_per_day*np.pi/180
+                
+                v, E, m = ac.calculate_anomalies(e, [0], [0], [days_to_angle], "Mean Anomaly")
+
+                a, b, c = om.celestial_objects[i].rotate_radial(v + om.celestial_objects[i].initial_angle*np.pi/180)
                 x[i] = a[0]
                 y[i] = b[0]
                 z[i] = c[0]
@@ -140,7 +150,8 @@ class PlotManager:
                         self.scatter_plots_3d[i].set_sizes([12])
                         
                     self.scatter_plots_3d[i].set_sizes([min(om.celestial_objects[i].size*5,20)])
-    
+        self.fig.canvas.draw_idle()
+        
     def animate_2d(self, f, selected_id:list):
         frame = float(f)
         if len(selected_id) > 0:
@@ -150,7 +161,7 @@ class PlotManager:
             
             # degrees per day * days *pi/180 converts an input of days to radians
             #ac.set_anomalies(e,v,E,m,id)
-            ac.set_anomalies(e,[0],[0],[selected_id[0].degreePerDay*frame*np.pi/180],"Mean Anomaly")
+            ac.set_anomalies(e,[0],[0],[selected_id[0].degree_per_day*frame*np.pi/180],"Mean Anomaly")
 
             # convert angles from degrees back to radians
             v = ac.get_true_anomaly()*np.pi/180
@@ -203,11 +214,13 @@ class PlotManager:
             # [0, radial(a,e,v)*cos(v)],[0, radial(a,e,v)*sin(v)]
  
     def delete_animation_3d(self):
-        self.anim3d._stop()
+        if (len(self.scatter_plots_3d) > 0):
+            self.anim3d._stop()
         return
             
     def delete_animation_2d(self):
-        self.anim._stop()
+        if (len(self.scatter_plots_2d) > 0):
+            self.anim._stop()
         return
     
     def toggle_pause_3d(self):
@@ -231,6 +244,10 @@ class PlotManager:
 
         self.is_paused_2d = not self.is_paused_2d
 
+    def force_pause_2d(self):
+        self.anim.pause()
+        self.is_paused_2d = True
+
     def plot_sequence_animation_2d(self, plot_figure, selected_id: list):
         
         self.is_paused_2d = False
@@ -245,4 +262,5 @@ class PlotManager:
         self.is_paused_3d = False
         self.anim3d = animation.FuncAnimation(fig=plot_figure, func=self.animate_manual_3d, frames=int(365*5), interval = 120)
 
+    
 plot_manager = PlotManager()

@@ -1,22 +1,23 @@
-import numpy as np
-import math as m
-
 from celestial_classes import celestial_object as co 
 
-celestial_objects = []      # Declare global object list
+celestial_objects = []      # global object list
 
 def generate_object(name, color, size, a, e, v, i, w):
-    #any(x.name == "t2" for x in l)
+    
     if any(x.name == name for x in celestial_objects):
-        for x in celestial_objects:
-            if any(x.name == name for x in celestial_objects):
-                celestial_objects.remove(x)
+
+        for y in celestial_objects:
+            print("name to remove: " + name + ", current name is " + y.name)
+            if (y.name == name):
+                print("removing " + y.name + " from the list, and overwriting")
+                celestial_objects.remove(y)
+                break
+
         celestial_objects.append(co.CelestialObject(name, color, size, a, e, v, i, w))
         
-        pass
+        
     else:
         celestial_objects.append(co.CelestialObject(name, color, size, a, e, v, i, w))
-        
     return
 
 def get_celestial_objects():

@@ -19,11 +19,8 @@ class CelestialObject(Vector3):
     theta = np.linspace(0,2*np.pi,2000)
 
     r = np.ones(len(theta))
-    rx = np.zeros(len(theta))
-    ry = np.zeros(len(theta))
-    rz = np.zeros(len(theta))
-
-    degreePerDay = 0 
+    
+    degree_per_day = 0 
     period = 0
 
     # psi is longitude of asc. node, labeled psi for quaternion equation
@@ -58,7 +55,7 @@ class CelestialObject(Vector3):
         in degrees.
         """
         value = np.divide(360,365*self.period)
-        self.degreePerDay = value
+        self.degree_per_day = value
         return 
     
 
@@ -70,7 +67,7 @@ class CelestialObject(Vector3):
         p = self.semimajor_axis*(1-self.eccentricity**2)
         
         for i in range(0,len(self.theta)):
-            iterator = i+int(m.floor(self.initial_angle*1000))
+            iterator = i+int(np.floor(self.initial_angle*1000))
             if iterator > len(self.theta):
                 iterator = iterator - len(self.theta)
             angle = self.theta[iterator]
@@ -79,24 +76,6 @@ class CelestialObject(Vector3):
            
 
         return self.r
-    
-    
-    def radial_days(self, day):
-        """ The radial equation:
-        The radial equation: Returns a scalar value r
-        in polar coordinates, with an input of days that
-        is converted to an angle.
-        """
-        p = self.semimajor_axis*(1-self.eccentricity**2)
-
-        rval = (
-            p
-            / 
-            (1 + self.eccentricity*np.cos(self.degreePerDay*day*np.pi/180))
-                )
-           
-
-        return rval
     
     
     def radial_scalarAngle(self, angle):
@@ -117,50 +96,24 @@ class CelestialObject(Vector3):
         return rval
     
 
-    def radial_to_cart_array(self):
+    def radial_to_cart_array(self, angle):
         """ The radial equation:
         The radial equation converted to an array of positions
         in cartesian coordinates (xyz) 
         """
         p = self.semimajor_axis*(1-self.eccentricity**2)
-        z_radial = np.zeros(len(self.theta))
-        for i in range(0,len(self.theta)):  # populate r array for breaking into cartesian components
+        z_radial = np.zeros(len(angle))
+        for i in range(0,len(angle)):  # populate r array for breaking into cartesian components
 
-
-            angle = self.theta[i]
             self.r[i] = (
                     p 
                     / 
-                    (1 + self.eccentricity*np.cos(angle))
+                    (1 + self.eccentricity*np.cos(angle[i]))
                     )
 
-        x_radial = np.multiply(self.r,np.cos(self.theta))
-        y_radial = np.multiply(self.r,np.sin(self.theta))
+        x_radial = np.multiply(self.r,np.cos(angle))
+        y_radial = np.multiply(self.r,np.sin(angle))
         
-        return (x_radial,y_radial,z_radial)
-    
-    
-    def radial_to_cart_days(self, day):
-        """ The radial equation:
-        Returns the radial equation to scalar values xyz
-        with an input angle measured in days, with a conversion 
-        of degrees_per_day which assumes a constant velocity in 
-        the orbit. This is a useful assumption when using the 
-        mean anomaly to translate between the other angles.
-        """
-        p = self.semimajor_axis*(1-self.eccentricity**2)
-
-        rval = (
-            p
-            / 
-            (1 + self.eccentricity*np.cos(self.degreePerDay*day*np.pi/180))
-                )
-
-        x_radial = np.multiply(rval,np.cos(self.degreePerDay*day*np.pi/180))
-        y_radial = np.multiply(rval,np.sin(self.degreePerDay*day*np.pi/180))
-        
-        z_radial = 0
-
         return (x_radial,y_radial,z_radial)
     
 
@@ -172,37 +125,20 @@ class CelestialObject(Vector3):
         q = self.euler_to_quaternion(0,self.inclination,self.omega)
         u_quat = []
         
-        ux,uy,uz = self.radial_to_cart_array()
+        ux,uy,uz = self.radial_to_cart_array(angle)
         u = []
         for i in range(0,len(angle)):  
             u.append((ux[i], uy[i], uz[i]))
             u_quat.append(self.qv_mult(q,u[i]))
             u_quatx, u_quaty, u_quatz = zip(*u_quat)
         return u_quatx, u_quaty, u_quatz
-    
-    
-    def rotate_radial_scalarDay(self, day):
-        """ The radial equation:
-        Returns the radial equation as scalar values xyz
-        with inputs of a scalar angle in days.
-        """
-        q = self.euler_to_quaternion(0,self.inclination,self.omega)
-        u_quat = []
-        
-        ux,uy,uz = self.radial_to_cart_days(day)
-        u = []
-        u.append((ux, uy, uz))
-        u_quat.append(self.qv_mult(q,u[0]))
-        u_quatx, u_quaty, u_quatz = zip(*u_quat)
-        return u_quatx, u_quaty, u_quatz
-
 
     def euler_to_quaternion(self, phi, theta, psi):
         # phi = 0, theta:inclination, psi = longitude of ascending node 
-        qw = m.cos(phi/2) * m.cos(theta/2) * m.cos(psi/2) + m.sin(phi/2) * m.sin(theta/2) * m.sin(psi/2)
-        qx = m.sin(phi/2) * m.cos(theta/2) * m.cos(psi/2) - m.cos(phi/2) * m.sin(theta/2) * m.sin(psi/2)
-        qy = m.cos(phi/2) * m.sin(theta/2) * m.cos(psi/2) + m.sin(phi/2) * m.cos(theta/2) * m.sin(psi/2)
-        qz = m.cos(phi/2) * m.cos(theta/2) * m.sin(psi/2) - m.sin(phi/2) * m.sin(theta/2) * m.cos(psi/2)
+        qw = np.cos(phi/2) * np.cos(theta/2) * np.cos(psi/2) + np.sin(phi/2) * np.sin(theta/2) * np.sin(psi/2)
+        qx = np.sin(phi/2) * np.cos(theta/2) * np.cos(psi/2) - np.cos(phi/2) * np.sin(theta/2) * np.sin(psi/2)
+        qy = np.cos(phi/2) * np.sin(theta/2) * np.cos(psi/2) + np.sin(phi/2) * np.cos(theta/2) * np.sin(psi/2)
+        qz = np.cos(phi/2) * np.cos(theta/2) * np.sin(psi/2) - np.sin(phi/2) * np.sin(theta/2) * np.cos(psi/2)
  
         return [qw, qx, qy, qz]
     

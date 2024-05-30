@@ -5,20 +5,17 @@
 import numpy as np
 
 # Plotting
-from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-import matplotlib.animation as animation
 from matplotlib import style
 
 # GUI libraries
-import tkinter as tk
 import customtkinter as ctk
+import tkinter as tk
 import CTkListbox as CTkL
 
-# Implement custom ObjectManager class 
+# Custom Libraries 
 from cartographer_tools import object_manager as om 
 from cartographer_tools import angle_calculator as ac 
 from cartographer_tools import plot_manager as pm
@@ -28,19 +25,18 @@ from sql_utilities import mysql_celestial_ingester as mysql_c_i
 
 class Window(ctk.CTkFrame):
 
-    # define global variables
-    lines_true = []
-    lines_ecc = []
-    lines_mean = []
-    scatter_plots_3d = []
-    scatter_plots_2d = []
-
     def __init__(self, master = None, resolution="1280x720"):
         style.use("dark_background")
         ctk.CTkFrame.__init__(self, master)
         self.master = master
         self.resolution = resolution
         self.init_window()
+
+        # global list to store 
+        # the selected object 
+        # from tkinter gui
+        self.selected_id = []
+
     
 #region frontend facing GUI
                 
@@ -54,7 +50,7 @@ class Window(ctk.CTkFrame):
 
         self.tab_calculator = self.tabview.add("Calculator")
 
-        tutorial = """~~~IMPORTANT~~~ \nInput angles in units of degrees"""
+        tutorial = """~~~~~~IMPORTANT~~~~~~ \n\nInput angles in units of degrees"""
 
         self.calc_tutorial_textbox = ctk.CTkTextbox(master = self.tab_calculator, width=205, state='disabled', height = 70, fg_color="gray14")
         self.calc_tutorial_textbox.configure(state="normal")
@@ -106,12 +102,9 @@ class Window(ctk.CTkFrame):
 
     #region objects tab
 
-    # contains some plot methods
     def init_tab_objects(self):
 
-        # global list to store the selected object from tkinter gui
-        self.selected_id = []
-
+        
         self.tab_objects = self.tabview.add("Objects")
 
         objects_name_label = ctk.CTkLabel(master = self.tab_objects, text = 'Name')
@@ -122,7 +115,15 @@ class Window(ctk.CTkFrame):
 
 
         objects_color_label = ctk.CTkLabel(master = self.tab_objects, text ="Color - Size")
-        self.objects_color_var = ctk.CTkComboBox(master = self.tab_objects, width= 85, values=["Red", "Orange", "Yellow", "Green", "Blue", "Indigo", "Violet", "White","Gray"])
+        self.objects_color_var = ctk.CTkComboBox(master = self.tab_objects, width= 85, values=["Red", 
+                                                                                               "Orange", 
+                                                                                               "Yellow", 
+                                                                                               "Green", 
+                                                                                               "Blue", 
+                                                                                               "Indigo", 
+                                                                                               "Violet", 
+                                                                                               "White",
+                                                                                               "Gray"])
         objects_color_label.place(x=100, y=50)
         self.objects_color_var.place(x=10, y=50)
         
@@ -174,12 +175,16 @@ class Window(ctk.CTkFrame):
         objects_omega_label_units.place(x=170,y=250)
         self.objects_omega_entry.place(x=10, y=250)
 
-        self.objects_listedObjects = CTkL.CTkListbox(master = app, width=190,height=180, command= self.display_selected_object_values)
+        self.objects_listedObjects = CTkL.CTkListbox(master = app, 
+                                                    width=190, height=180, 
+                                                    command= self.display_selected_object_values)
         self.objects_listedObjects.place(x=1025, y=385 )
 
 
         self.objects_generate_button = ctk.CTkButton(master = self.tab_objects, text = "Generate Object", corner_radius=8, width = 210,
-                                                command =lambda: [om.generate_object(self.objects_name_var.get(),
+                                                command =lambda: [pm.plot_manager.force_pause_2d(),
+                                                                  self.selected_id.clear(),
+                                                                om.generate_object(self.objects_name_var.get(),
                                                                                     self.objects_color_var.get(),
                                                                                     self.objects_size_var.get(),
                                                                                     self.objects_semimajorAxis_var.get(),
@@ -187,27 +192,25 @@ class Window(ctk.CTkFrame):
                                                                                     self.objects_initAngle_var.get(),
                                                                                     self.objects_inclination_var.get(),
                                                                                     self.objects_omega_var.get()),
-                                                                                    self.populate_objects_list(),
-                                                                                    pm.plot_manager.delete_animation_2d(),
-                                                                                    pm.plot_manager.delete_animation_3d(),
-                                                                                    pm.plot_manager.generate_scatter_plots_3d,
-                                                                                    pm.plot_manager.generate_scatter_plots_2d,
-                                                                                    self.delete_visual_feedback()]
+                                                                                    # pm.plot_manager.delete_animation_2d(),
+                                                                                    # pm.plot_manager.delete_animation_3d(),
+                                                                                    self.plot_sequence_2d(),
+                                                                                    self.plot_sequence_3d(),
+                                                                                    self.delete_visual_feedback(),
+                                                                                    self.populate_objects_list()]
                                                                                     )
                                                                                             
         self.objects_generate_button.place(x=10,y=290)
 
         self.objects_delete_button = ctk.CTkButton(master = app, text = "Delete Object", corner_radius=8, width = 210, fg_color="gray10", state="DISABLED", 
-                                                   command = lambda: [pm.plot_manager.delete_animation_2d(),
-                                                                      pm.plot_manager.delete_animation_3d(),
-                                                                      self.delete_selected_object(),
+                                                   command = lambda: [self.delete_selected_object(),
                                                                       self.plot_sequence_2d(),
-                                                                      self.plot_sequence_3d(), 
+                                                                      self.plot_sequence_3d(),
                                                                       self.populate_objects_list(), 
                                                                       self.delete_visual_feedback()])
         self.objects_delete_button.place(x=1025,y=615)
 
-        self.objects_Clear_button = ctk.CTkButton(master = app, text = "Clear Objects", corner_radius=8, width = 210, command = lambda: [om.clear_celestial_objects(), self.populate_objects_list(), self.delete_visual_feedback()])
+        self.objects_Clear_button = ctk.CTkButton(master = app, text = "Clear Objects", corner_radius=8, width = 210, command = lambda: [om.clear_celestial_objects(), self.delete_visual_feedback(), self.plot_sequence_2d(), self.plot_sequence_3d(), self.populate_objects_list()])
         self.objects_Clear_button.place(x=1025,y=655)
 
         self.objects_listedObjects.configure(height=6)
@@ -217,24 +220,29 @@ class Window(ctk.CTkFrame):
     # region frontend visual feedback methods
     
     def populate_objects_list(self):
+        print("populating object list with values...")
+        
         self.objects_listedObjects.delete("all")
-        for i in range(0,len(om.get_celestial_objects())):
-                
-                self.objects_listedObjects.insert(i,om.get_celestial_objects()[i].name) 
+        cobj = om.get_celestial_objects()
+
+        if len(cobj) > 0:
+
+            for i,x in enumerate((cobj)):
+                print(f"adding {x.name} to the list")
+                self.objects_listedObjects.insert(i, x.name) 
         
         return
     
-    # contains plotting methods
-        # delete_animation_2d()
-        # plot_sequence_2d()
+    
     def display_selected_object_values(self, selected_option):
         
-        for x in (om.get_celestial_objects()) :
+        cobj = om.get_celestial_objects()
+        for x in (cobj) :
 
             if x.name == selected_option:
                 print("selected_id is now "+ str(selected_option))
                 self.selected_id = [x]
-                pm.plot_manager.init_2d_plotting(self.fig)
+                pm.plot_manager.init_2d_plotting(pm.plot_manager.fig)
                 self.delete_visual_feedback()
                 # populate fields with object's parameters
                 self.objects_name_var.set(x.name)
@@ -278,24 +286,26 @@ class Window(ctk.CTkFrame):
                 else:
                     self.objects_omega_var.set(f'{x.omega:.3}')
                 
-                if len(pm.plot_manager.scatter_plots_2d) > 0:
-                    pm.plot_manager.delete_animation_2d()
-                
                 self.plot_sequence_2d()
         return
     
     def delete_selected_object(self):
         # Identify the object by name
-        print(self.selected_id[0].name)
-        for x in om.get_celestial_objects():
-            
-            if len(self.selected_id) == 0:
-                pass
+        print("deleting " + self.selected_id[0].name)
+        cobj = om.get_celestial_objects()
 
-            elif x.name == self.selected_id[0].name:
-                print("removing item")
-                om.celestial_objects.remove(self.selected_id[0])
-                self.selected_id.clear()
+        if len(self.selected_id) == 0:
+            
+            return
+
+        else:
+            name_to_delete = self.selected_id[0].name
+            for x in cobj:
+                
+                if x.name == name_to_delete:
+                    print("removing item")
+                    om.celestial_objects.remove(self.selected_id[0])
+                    self.selected_id.remove(x)
 
     def delete_visual_feedback(self):
         if len(self.selected_id) == 0 :
@@ -401,9 +411,9 @@ class Window(ctk.CTkFrame):
         self.frame_plotwindow.place(x=20,y =20)
         
         # 11.7, 8.1
-        self.fig = Figure(figsize=(11.7,8.1))
+        # self.fig = Figure(figsize=(11.7,8.1))
 
-        self.canvas = FigureCanvasTkAgg(self.fig,
+        self.canvas = FigureCanvasTkAgg(pm.plot_manager.fig,
                                         master = self.frame_plotwindow)  # A tk.DrawingArea.
 
         self.button_quit = ctk.CTkButton(master = self.frame_plotwindow, 
@@ -418,34 +428,35 @@ class Window(ctk.CTkFrame):
         self.toolbar.update()
         self.canvas.get_tk_widget().place(x=20, y=20)    
         
-        pm.plot_manager.init_3d_plotting(self.fig)
+        pm.plot_manager.init_3d_plotting(pm.plot_manager.fig)
 
     #endregion
 
 
     def plot_sequence_3d(self):
+        print("plot sequence: 3d")
         self.init_3d_plot_window()
-        pm.plot_manager.init_2d_plotting(self.fig)
+        # pm.plot_manager.init_2d_plotting(pm.plot_manager.fig)
         pm.plot_manager.generate_scatter_plots_3d()
-        pm.plot_manager.generate_scatter_plots_2d(self.selected_id)
-        pm.plot_manager.plot_full_orbits_3d(self.fig)
-        pm.plot_manager.plot_full_orbit_2d(self.fig, self.selected_id)
-        pm.plot_manager.plot_sequence_animation_3d(self.fig)
-        pm.plot_manager.animate_manual_3d(0) 
+        # pm.plot_manager.generate_scatter_plots_2d(self.selected_id)
+        pm.plot_manager.plot_full_orbits_3d(pm.plot_manager.fig)
+        # pm.plot_manager.plot_full_orbit_2d(pm.plot_manager.fig, self.selected_id)
+        pm.plot_manager.plot_sequence_animation_3d(pm.plot_manager.fig)
+        pm.plot_manager.animate_manual_3d(0)
         return
     
     def plot_sequence_2d(self):
-        pm.plot_manager.init_2d_plotting(self.fig)
+        pm.plot_manager.init_2d_plotting(pm.plot_manager.fig)
         pm.plot_manager.generate_scatter_plots_2d(self.selected_id)
-        pm.plot_manager.plot_full_orbit_2d(self.fig, self.selected_id)
-        pm.plot_manager.plot_sequence_animation_2d(self.fig, self.selected_id)
+        pm.plot_manager.plot_full_orbit_2d(pm.plot_manager.fig, self.selected_id)
+        pm.plot_manager.plot_sequence_animation_2d(pm.plot_manager.fig, self.selected_id)
         return
 
     
     #region calc window backend
 
 
-    def calculate_angles(self):
+    def translate_anomalies(self):
         
         deg_to_rad = np.pi/180
         _e = self.calc_eccentricity_var.get()
@@ -524,7 +535,7 @@ class Window(ctk.CTkFrame):
 
 
     def calc_callback(self, *args):
-        self.calculate_angles()
+        self.translate_anomalies()
         self.display_angles() 
           
      
@@ -536,7 +547,7 @@ class Window(ctk.CTkFrame):
     def init_window(self):
     
         self.init_3d_plot_window()
-        pm.plot_manager.init_2d_plotting(self.fig)
+        pm.plot_manager.init_2d_plotting(pm.plot_manager.fig)
         self.init_tabs()
         self.init_tab_configure()
         self.init_tab_objects()

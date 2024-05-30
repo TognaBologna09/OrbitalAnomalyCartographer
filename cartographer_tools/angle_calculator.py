@@ -46,8 +46,33 @@ def set_anomalies(e,v,E,m,id):
             
             set_global_angles(_v,_E,m)
 
-
+def calculate_anomalies(e,v,E,m,id):
+    match id:
+        case "True Anomaly":
+            # routine 1
+            # v is the original angle to transform
+            _E = E_ecc_anom(e, v)
+            _m = M_kep_eq(e,_E)
             
+            return v, _E, _m
+        
+        case "Eccentric Anomaly":
+            # print("routine 2")
+            # routine 2
+            # E is the original angle to transform
+            _v = E_to_v(e,E)
+            _m = M_kep_eq(e,E)
+           
+            return _v, E, _m
+
+        case "Mean Anomaly":
+            # print("routine 3")
+            # routine 3
+            # M is the original angle to transform
+            _E = E_transcendental(e,m)
+            _v = E_to_v(e,_E)
+            
+            return _v, _E, m
 
 def set_global_angles(v,E,m):
     rad_to_deg = 180/np.pi

@@ -9,7 +9,7 @@ def generate_solar_planets():
                             database='orbital_objects')
     with cnx.cursor() as cursor:
 
-            result = cursor.execute("SELECT * FROM solar_planets")
+            cursor.execute("SELECT * FROM solar_planets")
 
             rows = cursor.fetchall()
 
@@ -17,7 +17,22 @@ def generate_solar_planets():
                 if rows[0] == "Sun":
                     pass
                 else:
-                    om.generate_object(rows[0], rows[1], rows[7], rows[2], rows[3], rows[4], rows[5], rows[6])
+                    # om.generate_object(name, 
+                    #                   color, 
+                    #                   size, 
+                    #                   a, 
+                    #                   e, 
+                    #                   theta_o, 
+                    #                   i, 
+                    #                   omega)
+                    om.generate_object(rows[0], 
+                                       rows[1], 
+                                       rows[7], 
+                                       rows[2], 
+                                       rows[3], 
+                                       rows[4], 
+                                       rows[5], 
+                                       rows[6])
 
     cnx.close()
     return
@@ -29,7 +44,7 @@ def generate_terrestrial_planets():
                             database='orbital_objects')
     with cnx.cursor() as cursor:
 
-            result = cursor.execute("SELECT * FROM solar_planets where semimajor_axis < 2")
+            cursor.execute("SELECT * FROM solar_planets where semimajor_axis < 2")
 
             rows = cursor.fetchall()
 
@@ -49,7 +64,7 @@ def generate_jovian_planets():
                             database='orbital_objects')
     with cnx.cursor() as cursor:
 
-            result = cursor.execute("SELECT * FROM solar_planets WHERE semimajor_axis > 2 ")
+            cursor.execute("SELECT * FROM solar_planets WHERE semimajor_axis > 2 ")
 
             rows = cursor.fetchall()
 
